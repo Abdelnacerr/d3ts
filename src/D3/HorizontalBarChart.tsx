@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import data from './Data'
-import { svg } from 'd3'
 
 const HorizontalBarChart = () => {
 	const svgRef = useRef<SVGSVGElement | null>(null)
@@ -12,14 +11,11 @@ const HorizontalBarChart = () => {
 		undefined
 	>>(null)
 
-	const margin = {
-		top: 15,
-		right: 25,
-		bottom: 15,
-		left: 60,
-	}
-	const svgWidth = 960 - margin.left - margin.right,
-		svgHeight = 500 - margin.top - margin.bottom
+	//svg container width/height
+	const svgWidth = 500,
+		svgHeight = 300
+
+	const barWidth = svgWidth / data.length //width of each bar
 
 	const maxValue = d3.max(data, (d) => d.value)
 
@@ -29,31 +25,39 @@ const HorizontalBarChart = () => {
 		.scaleBand()
 		.domain(data.map((d) => d.name))
 		.range([0, svgWidth])
-		.paddingInner(0.02)
-		.paddingOuter(0.7)
+		.paddingInner(0.05)
+
 	const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+
+	// const yAxis = d3.axisLeft(y).ticks(3)
+	// const xAxis = d3.axisBottom(x)
 
 	useEffect(() => {
 		if (!selection) {
 			setSelection(d3.select(svgRef.current))
 		} else {
 			const svg = selection.attr('height', svgHeight).attr('width', svgWidth)
-			svg
+
+			const bars = svg
 				.selectAll('rect')
 				.data(data)
 				.enter()
 				.append('rect')
-				.attr('height', (d) => y(d.value))
 				.attr('width', x.bandwidth)
+				.attr('height', (d) => y(d.value))
+				.attr('x', (d) => x(d.name)!)
+				.attr('y', (d) => svgHeight - y(d.value))
 				.attr('fill', (d) => colorScale(d.name))
-				.attr('x', (d) => {
-					const xValue = x(d.name)
-					if (xValue) {
-						return xValue
-					} else {
-						return null
-					}
-				}) //spacing
+
+			const text = svg
+				.selectAll('text')
+				.data(data) //data in waiting state
+				.enter()
+				.append('text') //takes a string or a function as a param
+				.text((d) => d.name)
+				.attr('y', (d) => svgHeight - d.value - 2) //subtract extra 2 pixels
+				.attr('x', (d, i) => barWidth * i)
+				.style('fill', 'blue')
 		}
 	}, [selection, colorScale, svgHeight, svgWidth, x, y])
 	// console.log(data[0].value)
