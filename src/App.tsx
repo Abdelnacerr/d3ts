@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import HorizontalBarChart from './D3.js/HorizontalBarChart'
+import HorizontalBarChart from './D3/HorizontalBarChart'
 
 function App() {
 	return (
