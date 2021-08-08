@@ -63,7 +63,7 @@ const HorizontalBarChart = () => {
 				.data(data)
 				.join('text')
 				.attr('x', (d) => x(d.value)!)
-				.attr('y', (d) => y(d.name)! )
+				.attr('y', (d) => y(d.name)!)
 				.attr('dy', '1.5em')
 				.attr('dx', -4)
 				.text((d) => d.value)
@@ -82,7 +82,7 @@ const HorizontalBarChart = () => {
 	return (
 		<div>
 			<h1>Bar Chart</h1>
-			<svg ref={svgRef} style={{ background: 'red' }}></svg>
+			<svg ref={svgRef}></svg>
 		</div>
 	)
 }
