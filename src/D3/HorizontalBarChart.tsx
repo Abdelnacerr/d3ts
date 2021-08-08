@@ -12,10 +12,9 @@ const HorizontalBarChart = () => {
 	>>(null)
 
 	const barHeight = 70
-	const margin = { top: 30, right: 0, bottom: 10, left: 30 }
-	const svgWidth = 750,
-		svgHeight =
-			Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
+	const margin = { top: 15, right: 25, bottom: 15, left: 60 }
+	const svgWidth = 960 - margin.left - margin.right,
+		svgHeight = 500 - margin.left - margin.right
 	const maxValue = d3.max(data, (d) => d.value)
 
 	const x = d3
@@ -29,22 +28,28 @@ const HorizontalBarChart = () => {
 		.rangeRound([margin.top, svgHeight - margin.bottom])
 		.paddingInner(0.1)
 
+	const yAxis = d3.axisLeft(y).tickSize(0)
+
 	const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
 
 	useEffect(() => {
 		if (!selection) {
 			setSelection(d3.select(svgRef.current))
 		} else {
-			const svg = selection.attr('height', svgHeight).attr('width', svgWidth)
+			const svg = selection
+				.attr('width', svgWidth + margin.left + margin.right)
+				.attr('height', svgHeight + margin.top + margin.bottom)
+				.append('g')
+				.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
 			const bars = svg
 				.selectAll('rect')
 				.data(data)
 				.enter()
 				.append('rect')
-				.attr('height', y.bandwidth() / 2)
+				.attr('height', y.bandwidth())
 				.attr('width', (d) => x(d.value))
-				.attr('y', (d) => y(d.name)! / 2)
+				.attr('y', (d) => y(d.name)!)
 				.attr('x', 0)
 				.attr('fill', (d) => colorScale(d.name))
 
@@ -58,9 +63,9 @@ const HorizontalBarChart = () => {
 				.data(data)
 				.join('text')
 				.attr('x', (d) => x(d.value)!)
-				.attr('y', (d) => y(d.name)! / 2 + 6)
-				.attr('dy', '1em')
-				.attr('dx', -5)
+				.attr('y', (d) => y(d.name)! )
+				.attr('dy', '1.5em')
+				.attr('dx', -4)
 				.text((d) => d.value)
 				.call((text) =>
 					text
@@ -69,13 +74,15 @@ const HorizontalBarChart = () => {
 						.attr('fill', 'black')
 						.attr('text-anchor', 'start')
 				)
+
+			svg.append('g').attr('transform', `translate(0,0)`).call(yAxis)
 		}
 	}, [selection, colorScale, svgHeight, svgWidth, x, y])
 
 	return (
 		<div>
 			<h1>Bar Chart</h1>
-			<svg ref={svgRef}></svg>
+			<svg ref={svgRef} style={{ background: 'red' }}></svg>
 		</div>
 	)
 }
