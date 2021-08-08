@@ -11,22 +11,23 @@ const HorizontalBarChart = () => {
 		undefined
 	>>(null)
 
-	// const data = dataset.sort(function (a, b) {
-	// 	return d3.ascending(a.value, b.value)
-	// })
-
+	const barHeight = 70
+	const margin = { top: 30, right: 0, bottom: 10, left: 30 }
 	const svgWidth = 750,
-		svgHeight = 750
-
+		svgHeight =
+			Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
 	const maxValue = d3.max(data, (d) => d.value)
 
-	const x = d3.scaleLinear().domain([0, maxValue!]).range([0, svgHeight])
+	const x = d3
+		.scaleLinear()
+		.domain([0, maxValue!])
+		.range([margin.left, svgWidth - margin.right])
 
 	const y = d3
 		.scaleBand()
 		.domain(data.map((d) => d.name))
-		.range([0, svgWidth])
-		.paddingInner(0.05)
+		.rangeRound([margin.top, svgHeight - margin.bottom])
+		.paddingInner(0.1)
 
 	const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
 
@@ -41,28 +42,40 @@ const HorizontalBarChart = () => {
 				.data(data)
 				.enter()
 				.append('rect')
-				.attr('height', y.bandwidth)
+				.attr('height', y.bandwidth() / 2)
 				.attr('width', (d) => x(d.value))
-				.attr('y', (d) => y(d.name)!)
+				.attr('y', (d) => y(d.name)! / 2)
 				.attr('x', 0)
 				.attr('fill', (d) => colorScale(d.name))
 
-			// 	const text = svg
-			// 		.selectAll('text')
-			// 		.data(data) //data in waiting state
-			// 		.enter()
-			// 		.append('text') //takes a string or a function as a param
-			// 		.text((d) => d.name)
-			// 		.attr('y', (d) => svgHeight - d.value - 2) //subtract extra 2 pixels
-			// 		.attr('x', (d, i) => 5 * i)
-			// 		.style('fill', 'blue')
+			svg
+				.append('g')
+				.attr('fill', 'black')
+				.attr('text-anchor', 'end')
+				.attr('font-family', 'sans-serif')
+				.attr('font-size', 12)
+				.selectAll('text')
+				.data(data)
+				.join('text')
+				.attr('x', (d) => x(d.value)!)
+				.attr('y', (d) => y(d.name)! / 2 + 6)
+				.attr('dy', '1em')
+				.attr('dx', -5)
+				.text((d) => d.value)
+				.call((text) =>
+					text
+						.filter((d) => x(d.value) - x(0) < 20) // short bars
+						.attr('dx', +4)
+						.attr('fill', 'black')
+						.attr('text-anchor', 'start')
+				)
 		}
 	}, [selection, colorScale, svgHeight, svgWidth, x, y])
 
 	return (
 		<div>
 			<h1>Bar Chart</h1>
-			<svg ref={svgRef} width={900} height={500}></svg>
+			<svg ref={svgRef}></svg>
 		</div>
 	)
 }
