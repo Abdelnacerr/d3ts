@@ -44,18 +44,18 @@ const HorizontalBarChart = () => {
 				.attr('height', y.bandwidth)
 				.attr('width', (d) => x(d.value))
 				.attr('y', (d) => y(d.name)!)
-				.attr('x', (d) => svgHeight - x(d.value))
+				.attr('x', 0)
 				.attr('fill', (d) => colorScale(d.name))
 
-			// const text = svg
-			// 	.selectAll('text')
-			// 	.data(data) //data in waiting state
-			// 	.enter()
-			// 	.append('text') //takes a string or a function as a param
-			// 	.text((d) => d.name)
-			// 	.attr('y', (d) => svgHeight - d.value - 2) //subtract extra 2 pixels
-			// 	.attr('x', (d, i) => barWidth * i)
-			// 	.style('fill', 'blue')
+			// 	const text = svg
+			// 		.selectAll('text')
+			// 		.data(data) //data in waiting state
+			// 		.enter()
+			// 		.append('text') //takes a string or a function as a param
+			// 		.text((d) => d.name)
+			// 		.attr('y', (d) => svgHeight - d.value - 2) //subtract extra 2 pixels
+			// 		.attr('x', (d, i) => 5 * i)
+			// 		.style('fill', 'blue')
 		}
 	}, [selection, colorScale, svgHeight, svgWidth, x, y])
 
